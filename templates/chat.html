@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content%}
+
+<div class="messagebox">
+    <h2>Chat room: {{room}}</h2>
+    <div class="messages" id="messages"></div>
+
+    <div class="inputs">
+        <input type="text" placeholder="messages" row="3" name ="message" id="message">
+        <button type="button" name="send" id="sendbtn" onclick="sendMessage">send</button>
+    </div>
+</div>
+
+
+<script type="text/javascript">
+  
+  
+   var socket = io("http://127.0.0.1:5000/");
+    socket.on('connect', function() {
+        socket.emit('my event', {data: 'I\'m connected!'});
+    });
+
+</script>
+<script></script>
+
+{% endblock %}
