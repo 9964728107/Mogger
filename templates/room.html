@@ -16,7 +16,7 @@
   </div>
 </div>
 <script type="text/javascript">
-  var socketio = io();
+  // var socketio = io();
 
   const messages = document.getElementById("messages");
 
@@ -45,6 +45,8 @@
     message.value = "";
   };
 </script>
+
+
 {% for msg in messages %}
 <script type="text/javascript">
   createMessage("{{msg.name}}", "{{msg.message}}");
