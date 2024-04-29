@@ -19,7 +19,7 @@
             <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
        <!-- {% if load %}default{% else %}lds-roller{% endif %} -->
     </div>
- 
+      <h2>{{code}}</h2>
     <div class="flex justify-evenly p-6 rounded ">
 
         <div class="p-6 m-2 bg-slate-300 flex-1 ">
@@ -79,6 +79,7 @@
             
         </div>
     </div>
+    <div id="res"></div>
 
     <script>
        var socketio = io();
@@ -101,6 +102,12 @@
         answers:answers
        }
        console.log(data)
+       
+
+        socketio.on("varify", (scores) => {
+            console.log(scores);
+        });
+
        socketio.emit("varify",{data:data})
        socketio.on("update_points", (points) => {
         console.log(`Received points: ${points}`);
