@@ -2,6 +2,12 @@
 {% extends 'base.html' %} {% block content %}
 
 
+<!-- timer -->
+<h1 id="counter">0</h1>
+    <button id="start">Start</button>
+    <button id="stop">Stop</button>
+    <button id="reset">Reset</button>
+
     <h2 class="text-center p-2 text-bold bg-sky-200 ">LEARN FROM YOUR PDFs USING MCQS</h2>
   
     <div class="form text-center p-16 ">
@@ -160,6 +166,35 @@
     });
     </script>
 
-   
+ <script>
+      let intervalId;
+      let count = 10;
+
+      document.getElementById("start").addEventListener("click", function () {
+        
+        
+        intervalId = setInterval(function () {
+          count--;
+           if(count==0){
+            // window.alert("time over")
+            varify()
+            return
+          }
+          document.getElementById("counter").textContent = count;
+        }, 1000);
+ 
+       
+      });
+
+      document.getElementById("stop").addEventListener("click", function () {
+        clearInterval(intervalId);
+      });
+
+      document.getElementById("reset").addEventListener("click", function () {
+        count = 100;
+        document.getElementById("counter").textContent = count;
+        clearInterval(intervalId);
+      });
+    </script>
     
 {% endblock %}
