@@ -83,42 +83,51 @@
 
     <script>
        var socketio = io();
+       socketio.on('Paris',(data)=>{
+                console.log(data)
+            })
+       socketio.on("varify", (data) => {
+             console.log(data);
+  // Update the UI with the new points value
+  document.getElementById("points").innerHTML = `Points: ${data.score}`;
+});
     
       function varify(){
-    //    const answers='{{answers}}'
-    const answerss= document.querySelectorAll(".answer");
-    const answers = Array.from(answerss).map(answer => answer.textContent);
-    // const cleanedAnswers = Array.from(answers).map(answer => answer.replace(/&#39;/g, ''));
+    
+           const answerss= document.querySelectorAll(".answer");
+           const answers = Array.from(answerss).map(answer => answer.textContent);
+            // const cleanedAnswers = Array.from(answers).map(answer => answer.replace(/&#39;/g, ''));
     
 
-        console.log('answers:', answers)
-        // const elements = document.querySelectorAll('.answer');
-        // const values = Array.from(elements).map(element => element.textContent);
-        const elements = document.querySelectorAll('input.option:checked');
-        const choices = Array.from(elements).map(element => element.value);
-        console.log("checked:",choices);
-       const data={
-        choices:choices,
-        answers:answers
-       }
-       console.log(data)
-       
+            // console.log('answers:', answers)
+            // const elements = document.querySelectorAll('.answer');
+            // const values = Array.from(elements).map(element => element.textContent);
+            const elements = document.querySelectorAll('input.option:checked');
+            const choices = Array.from(elements).map(element => element.value);
+            // console.log("checked:",choices);
+            const data={
+                choices:choices,
+                answers:answers
+            }
+            // console.log(data)
+            socketio.emit("paris","nigger")
+            
+            console.log("data",data)
+            socketio.emit("varify", data);
 
-        socketio.on("varify", (scores) => {
-            console.log(scores);
-        });
+            
 
-       socketio.emit("varify",{data:data})
-       socketio.on("update_points", (points) => {
-        console.log(`Received points: ${points}`);
-        // Update the UI with the new points value
-        document.getElementById("points").innerHTML = `Points: ${points}`;
-        }); 
-        console.log(choices);
-        // console.log(compare,points)
-          
         
-        
+        // socketio.on("update_points", (points) => {
+        //     console.log(`Received points: ${points}`);
+        //     // Update the UI with the new points value
+        //     document.getElementById("points").innerHTML = `Points: ${points}`;
+        //     }); 
+            // console.log(choices);
+            // console.log(compare,points)
+            
+            
+            
 
       }
     

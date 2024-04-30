@@ -208,17 +208,21 @@ def dipl():
             # return render_template("chat.html", data="text", response=response['questions'], load=False)
             return render_template("chat.html", data="text",code=room, response=response, load=False, answers=answers)
             
+@socketio.on("paris")
+def paris(string):
+    print(string)
+    room=session["room"]
+    print("room",room)
+    socketio.emit('Paris', "morning", room=room)
 
 
 @socketio.on("varify")
 def varify(data):
-    room = session.get("room")
-    if room not in rooms:
-        return 
-    
+    room=session["room"]
+     
     print(type(data))
-    choices = data['data']['choices']
-    answers = data['data']['answers']
+    choices = data['choices']
+    answers = data['answers']
 
     print("Choices:", choices)
     print("Answers:", answers)
@@ -239,17 +243,19 @@ def varify(data):
     print("Result:", result)
     print('points',points)
 
-    # socketio.emit("update_points", points) 
+    socketio.emit("update_points", points) 
 
 
     content={
-        "name": session.get("name"),
+        "name": session["name"],
         "score": points
     }     
      
       
-    send(content, to=room)
-    rooms[room]["messages"].append(content)
+    # send(content, to=room)
+    socketio.emit('varify', content)#, room=room
+    print(content)
+    # rooms[room]["messages"].append(content)
     print(f"{session.get('name')} scored: {content['score']}")
 
     
