@@ -1,65 +1,55 @@
-
-{% extends 'base.html' %} {% block content %}
-
+{% extends 'base.html' %} 
+{% block content %}
 
 <!-- timer -->
 <h1 id="counter">0</h1>
-    <button id="start">Start</button>
-    <button id="stop">Stop</button>
-    <button id="reset">Reset</button>
+<button id="start">Start</button>
+<button id="stop">Stop</button>
+<button id="reset">Reset</button>
 
-    <h2 class="text-center p-2 text-bold bg-sky-200 ">LEARN FROM YOUR PDFs USING MCQS</h2>
+<h2 class="text-center p-2 text-bold bg-sky-200 ">LEARN FROM YOUR PDFs USING MCQS</h2>
   
-    <div class="form text-center p-16 ">
-        <h3 id="points"></h3>
+<div class="form text-center p-16 ">
+    <h3 id="points"></h3>
 
-        <form class="text-center bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
-
-
+    <form class="text-center bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
         <label for="pdf_file" class="bg-slate-300 p-1" >Drop/Add your PDF</label><br><br>
         <input type="file" id="pdfEntry" name="pdf_file" required ><br><br>
-        <button  class="bg-slate-400 hover:bg-slate-300 p-2 rounded submit" type="submit">Submit</button>
-        </form>
-         <br>
-         <div class=" default">
-            <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div></div>
-       <!-- {% if load %}default{% else %}lds-roller{% endif %} -->
+        <button  class="bg-slate-400 hover:bg-slate-300 p-2 rounded submit" type="submit"  >Submit</button>
+    </form>
+    <br>
+    <div class="default">
+        <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
-      <h2>{{code}}</h2>
-    <div class="flex justify-evenly p-6 rounded ">
+</div>
 
-        <div class="p-6 m-2 bg-slate-300 flex-1 ">
-            
-            <h2>pdf content</h2>
-                 <div class="p-1">
-                    <div class="qn bg-sky-200 p-4">
-                        {{data}}
-                        <!-- {{response.text}} -->
-                    </div>
-                    <div>
-                        {{response}}
+<h2>{{code}}</h2>
 
-                    </div>
-                   
-                </div>
+<div class="flex justify-evenly p-6 rounded ">
 
-            
-
-            
-            
-            
+    <div class="p-6 m-2 bg-slate-300 flex-1 ">
+        <h2>pdf content</h2>
+        <div class="p-1">
+            <div class="qn bg-sky-200 p-4">
+                {{data}}
+            </div>
         </div>
-        <div class=" p-6 m-2 bg-slate-300 flex-1">
-            <h2>mcqs for you</h2>
-             {% for qn in response %}
+    </div>
+
+    <div class=" p-6 m-2 bg-slate-300 flex-1">
+        <h2>mcqs for you</h2>
+        <div id="questions-container">
+            <!-- Questions will be added dynamically here -->
+           {% if response != "" %}
+                 {% for qn in response %}
         <div class="flex flex-col m-2 rounded bg-sky-300 ">
             <div class="p-1">
-                <div class="qn bg-sky-200 p-4">
+                <div class="qn bg-sky-200 p-4 question">
                     {{ qn['question'] }}
                 </div>
                     
                   
-                 <ol class="list-decimal list-inside p-4">
+                 <ol class="list-decimal list-inside p-4 options">
                     
                     {% for option in qn['options'] %}
                     
@@ -77,76 +67,50 @@
                
             </div>
         </div>
-        {% endfor %}
+        {% endfor %} 
+           {% endif %}
+        </div>
 
         <p>varifys</p>
         <button onclick="varify()">varify</button>
-
-            
-        </div>
     </div>
-    <div id="res"></div>
 
-    <script>
-       var socketio = io();
-       socketio.on('Paris',(data)=>{
-                console.log(data)
-            })
-       socketio.on("varify", (data) => {
-             console.log(data);
-        // Update the UI with the new points value
-        // data.forEach(element => {
-        //     console.log("-----")
-        //     console.log(element)
-        //     console.log("-----")
-        //     let G = document.createElement("LI").innerHTML = `Points: ${element.name} : ${element.score} `;
-            
-            
-        //     document.getElementById("points").appendChild(G)
-        // });
-        data=JSON.stringify(data)
-        document.getElementById("points").innerHTML = `Points: ${data} : `;
-        });
-    
-      function varify(){
-    
-           const answerss= document.querySelectorAll(".answer");
-           const answers = Array.from(answerss).map(answer => answer.textContent);
-            // const cleanedAnswers = Array.from(answers).map(answer => answer.replace(/&#39;/g, ''));
-    
+</div>
+<div id="res"></div>
 
-            // console.log('answers:', answers)
-            // const elements = document.querySelectorAll('.answer');
-            // const values = Array.from(elements).map(element => element.textContent);
-            const elements = document.querySelectorAll('input.option:checked');
-            const choices = Array.from(elements).map(element => element.value);
-            // console.log("checked:",choices);
-            const data={
-                choices:choices,
-                answers:answers
-            }
-            // console.log(data)
-            socketio.emit("paris","nigger")
-            
-            console.log("data",data)
-            socketio.emit("varify", data);
+<script>
+    var socketio = io();
+    socketio.emit("response", 4);
 
-            
+    socketio.on('response', function(response) {
+        // Handle the response from the server
+        console.log('Received MCQs:', response);
+        addQuestionsToDOM(response);
+    });
 
-        
-        // socketio.on("update_points", (points) => {
-        //     console.log(`Received points: ${points}`);
-        //     // Update the UI with the new points value
-        //     document.getElementById("points").innerHTML = `Points: ${points}`;
-        //     }); 
-            // console.log(choices);
-            // console.log(compare,points)
-            
-            
-            
+    socketio.on('Paris', function(data) {
+        console.log(data);
+    });
 
-      }
-    
+    socketio.on("varify", function(data) {
+        console.log(data);
+        document.getElementById("points").innerHTML = `Points: ${JSON.stringify(data)} : `;
+    });
+
+    function varify() {
+        const answerss = document.querySelectorAll(".answer");
+        const answers = Array.from(answerss).map(answer => answer.textContent);
+        const elements = document.querySelectorAll('input.option:checked');
+        const choices = Array.from(elements).map(element => element.value);
+        const data = {
+            choices: choices,
+            answers: answers
+        };
+        socketio.emit("paris", "nigger");
+        console.log("data", data);
+        socketio.emit("varify", data);
+    }
+
     // Get a reference to the form
     const form = document.querySelector("form");
 
@@ -164,10 +128,58 @@
 
         console.log("Form submitted. Adding .lds-roller. class to  'default'");
     });
-    </script>
 
- <script>
-      let intervalId;
+    // Creating questions
+    function createQuestionHTML(questionData) {
+        // Create a container div for the question
+        var questionDiv = document.createElement('div');
+        questionDiv.classList.add('flex', 'flex-col', 'm-2', 'rounded', 'bg-sky-300');
+
+        // Create a div for the question text
+        var questionTextDiv = document.createElement('div');
+        questionTextDiv.classList.add('p-1', 'qn', 'bg-sky-200', 'p-4', 'question');
+        questionTextDiv.textContent = questionData.question;
+
+        // Create an ordered list for options
+        var optionsList = document.createElement('ol');
+        optionsList.classList.add('list-decimal', 'list-inside', 'p-4', 'options');
+
+        // Loop through options and create list items
+        questionData.options.forEach(function(option) {
+            var listItem = document.createElement('li');
+            listItem.innerHTML = `<input type="checkbox" class="option" name="${questionData.question}" value="${option}" required> &nbsp; ${option}`;
+            optionsList.appendChild(listItem);
+        });
+
+        // Create a paragraph for the answer
+        var answerPara = document.createElement('p');
+        answerPara.innerHTML = `<small class="p-1">hover for answer</small><p class="rounded p-1 bg-black transition duration-600 hover:bg-sky-300 w-fit text-center answer">${questionData.answer}</p>`;
+
+        // Append all elements to the question div
+        questionDiv.appendChild(questionTextDiv);
+        questionDiv.appendChild(optionsList);
+        questionDiv.appendChild(answerPara);
+
+        return questionDiv;
+    }
+
+    // Function to add questions to the DOM
+    function addQuestionsToDOM(response) {
+        var questionsContainer = document.getElementById('questions-container');
+        // Clear existing content
+        questionsContainer.innerHTML = '';
+        // Loop through response and create HTML for each question
+        response.forEach(function(questionData, index) {
+            var questionHTML = createQuestionHTML(questionData);
+            questionsContainer.appendChild(questionHTML);
+        });
+    }
+
+
+
+//  # Clock
+
+ let intervalId;
       let count = 10;
 
       document.getElementById("start").addEventListener("click", function () {
@@ -195,6 +207,6 @@
         document.getElementById("counter").textContent = count;
         clearInterval(intervalId);
       });
-    </script>
-    
+</script>
+
 {% endblock %}

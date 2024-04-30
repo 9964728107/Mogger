@@ -2,7 +2,7 @@ from flask import Flask, render_template, request, session, redirect, url_for
 from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
-
+import time
 import asyncio
 import re
 import json
@@ -16,6 +16,7 @@ app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
 rooms = {}
+mcqs={}
 
 def generate_unique_code(length):
     while True:
@@ -46,7 +47,7 @@ def home():
         room = code
         if create != False:
             room = generate_unique_code(4)
-            rooms[room] = {"members": 0, "scores": []}
+            rooms[room] = {"members": 0, "scores": [],"mcqs":[]}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
         
@@ -132,7 +133,7 @@ def dipl():
             return redirect(url_for("home"))
 
         #  return render_template("room.html", code=room, messages=rooms[room]["messages"])
-        return render_template("chat.html", data="",code=room, response="yet to cook", load=True)
+        return render_template("chat.html", data="",code=room, response="", load=True)
      if request.method == "POST":
             room = session.get("room")
             if "room" not in session or "name" not in session:
@@ -205,9 +206,44 @@ def dipl():
             print(answers)
             print("-----")
             print(response)
+            print("-----")
+            print(room)
+            
+            rooms[room]["mcqs"].append(response)
+            # rooms[room]["scores"].append(content) 
+
+            try:
+                socketio.emit("response", response, room=room)
+                print(f"Emitted response object to room {room}")
+            except Exception as e:
+                print(f"Error emitting response object: {e}")
+
 
             # return render_template("chat.html", data="text", response=response['questions'], load=False)
             return render_template("chat.html", data="text",code=room, response=response, load=False, answers=answers)
+            # return redirect(url_for("dipl"))
+# @socketio.on("response")
+# def mcqs():
+#     room = session.get('room')
+#     if room is None:
+#         print("Error: Room not found in session.")
+#         return
+
+#     response = rooms[room]['mcqs']
+#     if response is None:
+#         print("Error: MCQs not found for the room.")
+#         return
+   
+#     try:
+#         socketio.emit("response", response, room=room)
+#         print(f"Emitted response object to room {room}")
+#     except Exception as e:
+#         print(f"Error emitting response object: {e}")
+
+
+
+
+    
             
 @socketio.on("paris")
 def paris(string):
