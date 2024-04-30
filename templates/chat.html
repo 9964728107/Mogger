@@ -88,9 +88,19 @@
             })
        socketio.on("varify", (data) => {
              console.log(data);
-  // Update the UI with the new points value
-  document.getElementById("points").innerHTML = `Points: ${data.score}`;
-});
+        // Update the UI with the new points value
+        // data.forEach(element => {
+        //     console.log("-----")
+        //     console.log(element)
+        //     console.log("-----")
+        //     let G = document.createElement("LI").innerHTML = `Points: ${element.name} : ${element.score} `;
+            
+            
+        //     document.getElementById("points").appendChild(G)
+        // });
+        data=JSON.stringify(data)
+        document.getElementById("points").innerHTML = `Points: ${data} : `;
+        });
     
       function varify(){
     

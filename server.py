@@ -46,7 +46,7 @@ def home():
         room = code
         if create != False:
             room = generate_unique_code(4)
-            rooms[room] = {"members": 0, "messages": []}
+            rooms[room] = {"members": 0, "scores": []}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
         
@@ -95,6 +95,7 @@ def connect(auth):
     send({"name": name, "message": "has entered the room"}, to=room)
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
+    print(rooms)
 
 @socketio.on("disconnect")
 def disconnect():
@@ -219,6 +220,9 @@ def paris(string):
 @socketio.on("varify")
 def varify(data):
     room=session["room"]
+    if room not in rooms:
+        print("room was not there!")
+        return
      
     print(type(data))
     choices = data['choices']
@@ -251,9 +255,10 @@ def varify(data):
         "score": points
     }     
      
+    rooms[room]["scores"].append(content) 
       
     # send(content, to=room)
-    socketio.emit('varify', content)#, room=room
+    socketio.emit('varify', rooms[room]['scores'])#, room=room
     print(content)
     # rooms[room]["messages"].append(content)
     print(f"{session.get('name')} scored: {content['score']}")
