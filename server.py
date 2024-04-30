@@ -222,7 +222,7 @@ def varify(data):
     room=session["room"]
     if room not in rooms:
         print("room was not there!")
-        return
+       
      
     print(type(data))
     choices = data['choices']
@@ -257,8 +257,8 @@ def varify(data):
      
     rooms[room]["scores"].append(content) 
       
-    # send(content, to=room)
-    socketio.emit('varify', rooms[room]['scores'])#, room=room
+    #send(rooms[room]['scores'], to=room)
+    socketio.emit('varify',rooms[room]['scores'],to=room)#, room=room
     print(content)
     # rooms[room]["messages"].append(content)
     print(f"{session.get('name')} scored: {content['score']}")
