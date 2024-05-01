@@ -129,6 +129,7 @@
         
         data.forEach(function (name) {
         var listItem = document.createElement("li");
+        listItem.classList.add('bg-sky-300','p-1','text-sm')
         listItem.innerHTML = `${name}`;
         membersOl.appendChild(listItem);
         });

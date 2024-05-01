@@ -1,29 +1,24 @@
 {% extends 'base.html' %} 
 {% block content %}
 
-<!-- timer -->
-<div class="inline">
-<h1 id="counter">0</h1>
-<button id="start">Start</button>
-<button id="stop">Stop</button>
-<button id="reset">Reset</button>
-</div>
-
-<div class="members">
-    <h3>gang in the room</h3>
-    <ol id="members">
-       <!-- content from js -->
-    </ol>
-</div>
-
-
-
 <h2 class="text-center p-2 text-bold bg-sky-200 ">LEARN FROM YOUR PDFs USING MCQS</h2>
   
-<div class="form text-center p-16 ">
+<!-- timer -->
+<div class="flex flex-row justify-between m-6">
+    <div class="bg-slate-300 p-2 w-48" >
+        <h1 id="counter" class="p-2 bg-sky-200" >0</h1>
+        <button id="start">Start</button>
+        <button id="stop">Stop</button>
+        <button id="reset">Reset</button>
+        <div class="code p-2 bg-sky-200 mt-4">
+            <h5><small> Room Code:</small> <b class="bg-sky-300 p-1">{{code}}</b></h5>
+        </div>
+    </div>
+
+    <div class="form text-center p-16 ">
     <h3 id="points"></h3>
 
-    <form class="text-center bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
+    <form class="text-center w-4/5  bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
         <label for="pdf_file" class="bg-slate-300 p-1" >Drop/Add your PDF</label><br><br>
         <input type="file" id="pdfEntry" name="pdf_file" required ><br><br>
         <button  class="bg-slate-400 hover:bg-slate-300 p-2 rounded submit" type="submit"  >Submit</button>
@@ -34,7 +29,22 @@
     </div>
 </div>
 
-<h2>{{code}}</h2>
+    <div class="members bg-slate-300 p-2 w-48">
+        <h3 class="m-1 p-1 text-sm">gang in the room</h3>
+        <ol id="members" class="m-1 p-1 bg-sky-200 w-40">
+        <!-- content from js -->
+        </ol>
+    </div>
+
+</div>
+
+
+
+
+
+
+
+
 
 <div class="flex justify-evenly p-6 rounded ">
 
