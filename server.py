@@ -47,7 +47,7 @@ def home():
         room = code
         if create != False:
             room = generate_unique_code(4)
-            rooms[room] = {"members": 0, "scores": [],"mcqs":[]}
+            rooms[room] = {"members": 0, "scores": [],"mcqs":[],"names":[]}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
         
@@ -80,6 +80,7 @@ def message(data):
     }
     send(content, to=room)
     rooms[room]["messages"].append(content)
+   
     print(f"{session.get('name')} said: {data['data']}")
 
 @socketio.on("connect")
@@ -92,8 +93,18 @@ def connect(auth):
         leave_room(room)
         return
     
+    
+   
     join_room(room)
     send({"name": name, "message": "has entered the room"}, to=room)
+    #adding members in the list
+    if name not in rooms[room]['names']:
+      rooms[room]["names"].append(name)
+
+    socketio.emit('members',rooms[room]["names"],to=room)
+    # elif name in rooms[room]['names']:
+    #   socketio.emit('members',rooms[room]["names"],to=room)
+
     rooms[room]["members"] += 1
     print(f"{name} joined room {room}")
     print(rooms)
