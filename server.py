@@ -233,28 +233,22 @@ def dipl():
             # return render_template("chat.html", data="text", response=response['questions'], load=False)
             return render_template("chat.html", data="text",code=room, response=response, load=False, answers=answers)
             # return redirect(url_for("dipl"))
-# @socketio.on("response")
-# def mcqs():
-#     room = session.get('room')
-#     if room is None:
-#         print("Error: Room not found in session.")
-#         return
 
-#     response = rooms[room]['mcqs']
-#     if response is None:
-#         print("Error: MCQs not found for the room.")
-#         return
-   
-#     try:
-#         socketio.emit("response", response, room=room)
-#         print(f"Emitted response object to room {room}")
-#     except Exception as e:
-#         print(f"Error emitting response object: {e}")
+async def timer(data,room):
+    count = data
+    while count > 0:
+        print(count)
+        await asyncio.sleep(1)
+        socketio.emit("timer",count,to=room)    
+        count -= 1
+    print("time over")
+    socketio.emit("timer",count,to=room)
 
-
-
-
-    
+@socketio.on("initiateTimer")
+def initiateTimer(data):
+ room= session["room"]
+ asyncio.run(timer(data,room))
+ 
             
 @socketio.on("paris")
 def paris(string):

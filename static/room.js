@@ -1,12 +1,46 @@
 
     var socketio = io();
-    socketio.emit("response", 4);
+
+    function timer(data){
+        let intervalId;
+        let count = data;
+        intervalId = setInterval(function () {
+        count--;
+        if (count == 0) {
+            // window.alert("time over")
+            varify();
+            return;
+        }
+        document.getElementById("counter").textContent = count;
+        }, 1000);
+    }
+
+    socketio.on("timer", (data)=>{
+       document.getElementById("counter").textContent = "";
+       document.getElementById("counter").textContent = `${data}secs`;
+        
+       if (data == 0) {
+         
+         varify();
+         document.getElementById("counter").textContent = `Well Played`;
+         return;
+       }
+       console.log(data)
+       if(data==0){
+        console.log("submit")
+       }
+     
+    });
 
     socketio.on('response', function(response) {
-        // Handle the response from the server
-        console.log('Received MCQs:', response);
-        addQuestionsToDOM(response);
-    });
+      // Handle the response from the server
+      
+      console.log("Received MCQs:", response);
+      addQuestionsToDOM(response);
+      socketio.emit("initiateTimer", 10);
+
+      });
+   
 
     socketio.on('Paris', function(data) {
         console.log(data);
@@ -87,39 +121,6 @@
             questionsContainer.appendChild(questionHTML);
         });
     }
-
-
-
-//  # Clock
-
- let intervalId;
-      let count = 10;
-
-      document.getElementById("start").addEventListener("click", function () {
-        
-        
-        intervalId = setInterval(function () {
-          count--;
-           if(count==0){
-            // window.alert("time over")
-            varify()
-            return
-          }
-          document.getElementById("counter").textContent = count;
-        }, 1000);
- 
-       
-      });
-
-      document.getElementById("stop").addEventListener("click", function () {
-        clearInterval(intervalId);
-      });
-
-      document.getElementById("reset").addEventListener("click", function () {
-        count = 100;
-        document.getElementById("counter").textContent = count;
-        clearInterval(intervalId);
-      });
 
 
       socketio.on("members",(data)=>{
