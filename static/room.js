@@ -48,7 +48,28 @@
 
     socketio.on("varify", function(data) {
         console.log(data);
-        document.getElementById("points").innerHTML = `Points: ${JSON.stringify(data)} : `;
+        // data = JSON.stringify(data)
+        let points = document.getElementById("points");
+        points.innerHTML=""
+        //  var listItem = document.createElement("li");
+        // listItem.innerHTML = `${JSON.stringify(data)}`;
+        // points.appendChild(listItem);
+        let i=1;
+        data.forEach((person)=>{
+  
+            var listItem = document.createElement("li");
+            listItem.classList.add("bg-sky-300", "p-1", "text-md",'text-center');
+            listItem.innerHTML = ` <b>${i == 1 ? "&#128511;" : ""} ${
+              i == 2 ? "&#128561;" : ""
+            } ${i == 3 ? "&#128563;" : ""}</b>  ${person.name} : ${
+              person.score
+            }`;
+            points.appendChild(listItem);
+            i++
+            
+            
+        })
+        // document.getElementById("points").innerHTML = `Points: ${JSON.stringify(data)} : `;
     });
 
     function varify() {
@@ -130,7 +151,7 @@
         
         data.forEach(function (name) {
         var listItem = document.createElement("li");
-        listItem.classList.add('bg-sky-300','p-1','text-sm')
+        listItem.classList.add('bg-sky-300','p-1','text-sm', 'm-1')
         listItem.innerHTML = `${name}`;
         membersOl.appendChild(listItem);
         });

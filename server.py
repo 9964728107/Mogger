@@ -137,7 +137,7 @@ async def save_pdf(filename, pdf_file):
     
 
 @app.route("/mcqs",methods=["GET","POST"])
-def dipl():
+async def dipl():
      if request.method == "GET":
         room = session.get("room")
         if room is None or session.get("name") is None or room not in rooms:
@@ -152,73 +152,27 @@ def dipl():
                     return redirect(url_for("home"))
             room = session["room"]
             name = session["name"]
-            # pdf_file = request.files['pdf_file']
-            # filename = pdf_file.filename
-            # await save_pdf(filename, pdf_file)
-            # await asyncio.sleep(1)
-            # text = extract_text(f'uploads/{filename}')
-            # response = model.generate_content(f"For the given data, generate 5 multiple-choice questions based on the content of the PDF. Provide the questions and answer options in raw JSON format. Each question should include the question text and four options. The data to be used for generating questions is as follows: {text} \n\nSample JSON format:\n```json\n{{ 'questions': [ {{'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Berlin', 'Rome'],'answer':'answer'}}, {{'question': 'Who wrote \'Romeo and Juliet\'?', 'options': ['William Shakespeare', 'Jane Austen', 'Charles Dickens', 'Leo Tolstoy'],'answer':'answer'}}, {{'question': 'What is the chemical symbol for water?', 'options': ['O2', 'H2O', 'CO2', 'NaCl'],'answer':'answer'}} ] }}\n```")
-            response='''[
-            {
-                "question": "What is the primary goal of data science?",
-                "options": [
-                "To collect and store vast amounts of data",
-                "To derive meaningful insights and information from data",
-                "To develop and implement machine learning models",
-                "To create visualizations and dashboards"
-                ],
-                "answer": "To derive meaningful insights and information from data"
-            },
-            {
-                "question": "Which of the following is NOT a stage in the data science life cycle?",
-                "options": [
-                "Data collection",
-                "Data analysis",
-                "Model evaluation",
-                "Model development"
-                ],
-                "answer": "Model development"
-            },
-            {
-                "question": "What is the role of a data scientist in a data science project?",
-                "options": [
-                "To analyze data and extract insights",
-                "To develop machine learning models",
-                "To communicate findings to stakeholders",
-                "All of the above"
-                ],
-                "answer": "All of the above"
-            },
-            {
-                "question": "Which of the following industries is NOT commonly associated with the application of data science?",
-                "options": [
-                "Healthcare",
-                "Finance",
-                "Manufacturing",
-                "Education"
-                ],
-                "answer": "Education"
-            },
-            {
-                "question": "What is the key benefit of using data science in business decision-making?",
-                "options": [
-                "Increased efficiency and productivity",
-                "Improved customer insights",
-                "Optimized resource allocation",
-                "All of the above"
-                ],
-                "answer": "All of the above"
-            }
-            ]'''
-
-            # response = json.loads(re.sub(r'^```json\s+|```$', '', response.text))
-            response=json.loads(response)
+            pdf_file = request.files['pdf_file']
+            filename = pdf_file.filename
+            await save_pdf(filename, pdf_file)
+            await asyncio.sleep(1)
+            text = extract_text(f'uploads/{filename}')
+            print('text',text)
+            response = model.generate_content(f"For the given data, generate 5 multiple-choice questions based on the content of the PDF. Provide the questions and answer options in raw JSON format. Each question should include the question text and four options. The data to be used for generating questions is as follows: {text} \n\nSample JSON format:\n```json\n{{ 'questions': [ {{'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Berlin', 'Rome'],'answer':'answer'}}, {{'question': 'Who wrote \'Romeo and Juliet\'?', 'options': ['William Shakespeare', 'Jane Austen', 'Charles Dickens', 'Leo Tolstoy'],'answer':'answer'}}, {{'question': 'What is the chemical symbol for water?', 'options': ['O2', 'H2O', 'CO2', 'NaCl'],'answer':'answer'}} ] }}\n```")
+            json_string=response.text
+            json_string=re.sub(r'^```json\s+', '', json_string)
+            json_string = re.sub(r'\s+```$', '', json_string)
+            print(json_string)
+            response=json.loads(json_string)
+            print(response['questions'])
+            response=response['questions']
+            # response=json.loads(response)
             answers = list(map(lambda x: x['answer'], response))
             print(answers)
-            print("-----")
-            print(response)
-            print("-----")
-            print(room)
+            # print("-----")
+            # print(response)
+            # print("-----")
+            # print(room)
             
             rooms[room]["mcqs"].append(response)
             # rooms[room]["scores"].append(content) 
@@ -299,7 +253,8 @@ def varify(data):
     rooms[room]["scores"].append(content) 
       
     #send(rooms[room]['scores'], to=room)
-    socketio.emit('varify',rooms[room]['scores'],to=room)#, room=room
+    sorted_data = sorted(rooms[room]['scores'], key=lambda x: x['score'],reverse=True)
+    socketio.emit('varify',sorted_data,to=room)#, room=room
     print(content)
     # rooms[room]["messages"].append(content)
     print(f"{session.get('name')} scored: {content['score']}")
