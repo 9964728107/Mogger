@@ -1,4 +1,4 @@
-from flask import Flask, render_template, request, session, redirect, url_for
+from flask import Flask, render_template, request, session, redirect, url_for, flash
 from flask_socketio import join_room, leave_room, send, SocketIO
 import random
 from string import ascii_uppercase
@@ -47,7 +47,7 @@ def home():
         room = code
         if create != False:
             room = generate_unique_code(4)
-            rooms[room] = {"members": 0, "scores": [],"mcqs":[],"names":[]}
+            rooms[room] = {"members": 0, "scores": [],"mcqs":[],"names":[],"messages":[]}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
         
@@ -122,6 +122,9 @@ def disconnect():
     
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
+    rooms[room]['names'].remove(name)
+    socketio.emit('members',rooms[room]["names"],to=room)
+    flash('Someone Left Room', 'error')
 
 
 GOOGLE_API_KEY = ""

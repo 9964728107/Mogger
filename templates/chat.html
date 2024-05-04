@@ -50,10 +50,25 @@
 <div class="flex justify-evenly p-6 rounded ">
 
     <div class="p-6 m-2 bg-slate-300 flex-1 ">
-        <h2>pdf content</h2>
+        <h2>Talk to your homies</h2>
         <div class="p-1">
             <div class="qn bg-sky-200 p-4">
-                {{data}}
+               <div class="message-box">
+                
+                <div class="messages" id="messages"></div>
+                <div class="inputs">
+                    <input
+                    type="text"
+                    rows="3"
+                    placeholder="Message"
+                    name="message"
+                    id="message"
+                    />
+                    <button type="button" name="send" id="send-btn" onClick="sendMessage()">
+                    Send
+                    </button>
+                </div>
+                </div>
             </div>
         </div>
     </div>
@@ -93,8 +108,8 @@
            {% endif %}
         </div>
 
-        <p>varifys</p>
-        <button onclick="varify()">varify</button>
+        
+        <button onclick="varify()">Submit</button>
     </div>
 
 </div>
