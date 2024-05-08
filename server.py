@@ -1,6 +1,8 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
 from flask_socketio import join_room, leave_room, send, SocketIO,emit
 from dotenv import load_dotenv
+from pymongo import MongoClient
+
 import os
 import random
 from string import ascii_uppercase
@@ -18,6 +20,10 @@ app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
 
+cluster=MongoClient(os.getenv("MONGO_DB_URL"))
+db=cluster["test"]
+ROOMS=db["rooms"]
+ROOMS.insert_one({"room":"basement"})
 rooms = {}
 mcqs={}
 
@@ -50,6 +56,7 @@ def home():
         room = code
         if create != False:
             room = generate_unique_code(4)
+            ROOMS.insert_one({"members": 0, "scores": [],"mcqs":[],"names":[],"messages":[]})
             rooms[room] = {"members": 0, "scores": [],"mcqs":[],"names":[],"messages":[]}
         elif code not in rooms:
             return render_template("home.html", error="Room does not exist.", code=code, name=name)
@@ -83,7 +90,7 @@ def message(data):
     }
     send(content, to=room)
     rooms[room]["messages"].append(content)
-   
+    ROOMS.update_one({"_id": room}, {"$push": {"messages": content}})
     print(f"{session.get('name')} said: {data['data']}")
 
 @socketio.on("connect")
@@ -104,12 +111,13 @@ def connect(auth):
     #adding members in the list
     if name not in rooms[room]['names']:
       rooms[room]["names"].append(name)
-
+      ROOMS.update_one({"_id": room}, {"$push": {"names": name}})
     socketio.emit('members',rooms[room]["names"],to=room)
     # elif name in rooms[room]['names']:
     #   socketio.emit('members',rooms[room]["names"],to=room)
 
     rooms[room]["members"] += 1
+    ROOMS.update_one({"_id": room}, {"$inc": {"members": 1}})
     print(f"{name} joined room {room}")
     print(rooms)
 
@@ -121,12 +129,14 @@ def disconnect():
 
     if room in rooms:
         rooms[room]["members"] -= 1
+        ROOMS.update_one({"_id": room}, {"$inc": {"members": -1}})
         if rooms[room]["members"] <= 0:
             del rooms[room]
     
     send({"name": name, "message": "has left the room"}, to=room)
     print(f"{name} has left the room {room}")
     rooms[room]['names'].remove(name)
+    ROOMS.update_one({"_id": room}, {"$pull": {"names": name}})
     socketio.emit('members',rooms[room]["names"],to=room)
     flash('Someone Left Room', 'error')
 
@@ -155,6 +165,7 @@ async def dipl():
      if request.method == "POST":
             room = session.get("room")
             rooms[room]["scores"]=[]
+            ROOMS.update_one({"_id": room}, {"$set": {"scores": []}})
             if "room" not in session or "name" not in session:
                     session.clear()
                     return redirect(url_for("home"))
