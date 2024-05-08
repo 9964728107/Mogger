@@ -18,14 +18,14 @@
     <div class="form RGAG p-16 ">
     
     <ol id="points"></ol>
-
-    <form class="text-center bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
+    <h2 class="readyGuy"></h2>
+    <form id="FORM" class="text-center bg-sky-200 p-14" action="http://127.0.0.1:5000/mcqs" method="POST" enctype="multipart/form-data">
         <label for="pdf_file" class="bg-slate-300 p-1" >Drop/Add your PDF</label><br><br>
         <input type="file" id="pdfEntry" name="pdf_file" required ><br><br>
         <button  class="bg-slate-400 hover:bg-slate-300 p-2 rounded submit" type="submit"  >Submit</button>
     </form>
     <br>
-    <div class="default">
+    <div class="default  flex flex-col justify-items-center">
         <div></div><div></div><div></div><div></div><div></div><div></div><div></div><div></div>
     </div>
 </div>
@@ -33,8 +33,14 @@
     <div class="members bg-slate-300 p-2 w-48">
         <h3 class="m-1 p-1 text-sm ">gang in the room</h3>
         <ol id="members" class="m-1 p-1 bg-sky-200 w-40 p-2">
+
         <!-- content from js -->
         </ol>
+         <br><br>
+         <div class="flex flex-col justify-items-center rounded">
+            <h3 class="m-1 p-1 text-sm text-center rounded" >Ready to upload pdf?</h3>
+            <button onclick="ready()" id="ready" class="rounded button ready self-center m-1 p-1 bg-blue-300 p-2 hover:bg-blue-100" >Ready</button>
+        </div>
     </div>
 
 </div>

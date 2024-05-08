@@ -1,5 +1,7 @@
 from flask import Flask, render_template, request, session, redirect, url_for, flash
-from flask_socketio import join_room, leave_room, send, SocketIO
+from flask_socketio import join_room, leave_room, send, SocketIO,emit
+from dotenv import load_dotenv
+import os
 import random
 from string import ascii_uppercase
 import time
@@ -11,6 +13,7 @@ from google.generativeai import GenerativeModel
 from pdfminer.high_level import extract_text
 
 
+load_dotenv()
 app = Flask(__name__)
 app.config["SECRET_KEY"] = "hjhjsdahhds"
 socketio = SocketIO(app)
@@ -87,6 +90,7 @@ def message(data):
 def connect(auth):
     room = session.get("room")
     name = session.get("name")
+    
     if not room or not name:
         return
     if room not in rooms:
@@ -127,7 +131,7 @@ def disconnect():
     flash('Someone Left Room', 'error')
 
 
-GOOGLE_API_KEY = ""
+GOOGLE_API_KEY =os.getenv("API_GEMINI")
 genai.configure(api_key=GOOGLE_API_KEY)
 model = genai.GenerativeModel('gemini-pro')
 
@@ -150,6 +154,7 @@ async def dipl():
         return render_template("chat.html", data="",code=room, response="", load=True)
      if request.method == "POST":
             room = session.get("room")
+            rooms[room]["scores"]=[]
             if "room" not in session or "name" not in session:
                     session.clear()
                     return redirect(url_for("home"))
@@ -261,13 +266,17 @@ def varify(data):
     print(content)
     # rooms[room]["messages"].append(content)
     print(f"{session.get('name')} scored: {content['score']}")
+    
+    
 
     
     
-    
-
-    # Compare choices with answers
-   
+#getting ready
+@socketio.on("ready")
+def ready(string):
+    name=session.get("name")
+    emit('ready',name, broadcast=True)
+    # emit('ready', name, to="/")
 
 
     

@@ -37,7 +37,7 @@
       
       console.log("Received MCQs:", response);
       addQuestionsToDOM(response);
-      socketio.emit("initiateTimer", 10);
+      socketio.emit("initiateTimer", 17);
 
       });
    
@@ -73,6 +73,8 @@
     });
 
     function varify() {
+       let readyButton = document.getElementById("ready");
+        readyButton.classList.remove("hidden");
         const answerss = document.querySelectorAll(".answer");
         const answers = Array.from(answerss).map(answer => answer.textContent);
         const elements = document.querySelectorAll('input.option:checked');
@@ -81,6 +83,8 @@
             choices: choices,
             answers: answers
         };
+        
+       
         socketio.emit("paris", "nigger");
         console.log("data", data);
         socketio.emit("varify", data);
@@ -188,3 +192,20 @@
        socketio.emit("message", { data: message.value });
        message.value = "";
      };
+
+
+    //  Ready to upload
+    function ready(){
+    socketio.emit("ready", "i am ready");
+    }
+
+    socketio.on("ready",(name)=>{
+      console.log(name," is ready")
+      const readyButton = document.getElementsByClassName("ready")[0]
+       readyButton.classList.add("hidden");
+      const readyGuy = document.getElementsByClassName("readyGuy")[0]
+      readyGuy.innerText=`${name} is uploading pdf...`
+ 
+
+
+    })
