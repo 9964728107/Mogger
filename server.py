@@ -178,6 +178,7 @@ async def dipl():
             text = extract_text(f'uploads/{filename}')
             print('text',text)
             response = model.generate_content(f"For the given data, generate 5 multiple-choice questions based on the content of the PDF. Provide the questions and answer options in raw JSON format. Each question should include the question text and four options. The data to be used for generating questions is as follows: {text} \n\nSample JSON format:\n```json\n{{ 'questions': [ {{'question': 'What is the capital of France?', 'options': ['London', 'Paris', 'Berlin', 'Rome'],'answer':'answer'}}, {{'question': 'Who wrote \'Romeo and Juliet\'?', 'options': ['William Shakespeare', 'Jane Austen', 'Charles Dickens', 'Leo Tolstoy'],'answer':'answer'}}, {{'question': 'What is the chemical symbol for water?', 'options': ['O2', 'H2O', 'CO2', 'NaCl'],'answer':'answer'}} ] }}\n```")
+            # response = model.generate_content(f"generate a json data from {text} for hovewer amount of answers as possible")
             json_string=response.text
             json_string=re.sub(r'^```json\s+', '', json_string)
             json_string = re.sub(r'\s+```$', '', json_string)
@@ -188,10 +189,14 @@ async def dipl():
             # response=json.loads(response)
             answers = list(map(lambda x: x['answer'], response))
             print(answers)
+            file = open('KUSH.txt', 'w')
+            file.write(str(response))
+            file.close()
             # print("-----")
             # print(response)
             # print("-----")
             # print(room)
+
             
             rooms[room]["mcqs"].append(response)
             # rooms[room]["scores"].append(content) 
